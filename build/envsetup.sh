@@ -21,12 +21,6 @@ Additional LineageOS functions:
 - sort-blobs-list: Sort proprietary-files.txt sections with LC_ALL=C.
 - installboot:     Installs a boot.img to the connected device.
 - installrecovery: Installs a recovery.img to the connected device.
-
-Additional ChiTang UI functions:
-- gcommit:         Add, commit and push
-- gsync:           Sync current repo
-- gsyncf:          Sync current repo force
-- gdiff:           Show current workspace diff
 EOF
 }
 
@@ -933,7 +927,7 @@ alias cmkap='dopush cmka'
 
 function repopick() {
     T=$(gettop)
-    $T/vendor/chitang/build/tools/repopick.py $@
+    $T/vendor/lineage/build/tools/repopick.py $@
 }
 
 function sort-blobs-list() {
@@ -958,22 +952,4 @@ function fixup_common_out_dir() {
         [ -L ${common_out_dir} ] && rm ${common_out_dir}
         mkdir -p ${common_out_dir}
     fi
-}
-
-function gcommit() {
-    git add .
-    git commit -S
-    git push $(git remote) HEAD:tehc
-}
-
-function gsync() {
-    repo sync .
-}
-
-function gsyncf() {
-    repo sync --force-sync .
-}
-
-function gdiff() {
-    git diff
 }
