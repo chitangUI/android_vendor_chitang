@@ -11,13 +11,13 @@ include vendor/chitang/config/lineage_audio.mk
 # Include vendor addons
 include vendor/addons/config.mk
 =======
-$(call inherit-product, vendor/lineage/config/common.mk)
+$(call inherit-product, vendor/chitang/config/common.mk)
 
 # Include AOSP audio files
-include vendor/lineage/config/aosp_audio.mk
+include vendor/chitang/config/aosp_audio.mk
 
 # Include Lineage audio files
-include vendor/lineage/config/lineage_audio.mk
+include vendor/chitang/config/lineage_audio.mk
 >>>>>>> e67a0311b13c084c60512df68a93c8a776678a52
 
 # Default notification/alarm sounds
