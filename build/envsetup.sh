@@ -21,6 +21,9 @@ Additional LineageOS functions:
 - sort-blobs-list: Sort proprietary-files.txt sections with LC_ALL=C.
 - installboot:     Installs a boot.img to the connected device.
 - installrecovery: Installs a recovery.img to the connected device.
+
+Additional Chi_Tang UI functions:
+- ctco:            Commit and push
 EOF
 }
 
@@ -952,4 +955,10 @@ function fixup_common_out_dir() {
         [ -L ${common_out_dir} ] && rm ${common_out_dir}
         mkdir -p ${common_out_dir}
     fi
+}
+
+function ctco() {
+    git add .
+    git commit -S
+    git push $(git remote) HEAD:tehc
 }
