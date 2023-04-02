@@ -1,11 +1,14 @@
 # Inherit common mobile Lineage stuff
-$(call inherit-product, vendor/lineage/config/common.mk)
+$(call inherit-product, vendor/chitang/config/common.mk)
 
 # Include AOSP audio files
-include vendor/lineage/config/aosp_audio.mk
+include vendor/chitang/config/aosp_audio.mk
 
 # Include Lineage audio files
-include vendor/lineage/config/lineage_audio.mk
+include vendor/chitang/config/lineage_audio.mk
+
+# Include vendor addons
+include vendor/addons/config.mk
 
 # Default notification/alarm sounds
 PRODUCT_PRODUCT_PROPERTIES += \

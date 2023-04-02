@@ -14,14 +14,14 @@
 
 $(call inherit-product, build/target/product/sdk_phone_x86.mk)
 
-include vendor/lineage/build/target/product/lineage_generic_target.mk
+include vendor/chitang/build/target/product/lineage_generic_target.mk
 
 # Enable mainline checking
 PRODUCT_ENFORCE_ARTIFACT_PATH_REQUIREMENTS := relaxed
 
 # Overrides
 PRODUCT_NAME := lineage_sdk_phone_x86
-PRODUCT_MODEL := LineageOS Android SDK built for x86
+PRODUCT_MODEL := Chi_Tang UI Android SDK built for x86
 
 PRODUCT_SDK_ADDON_NAME := lineage
 PRODUCT_SDK_ADDON_SYS_IMG_SOURCE_PROP := $(LOCAL_PATH)/source.properties

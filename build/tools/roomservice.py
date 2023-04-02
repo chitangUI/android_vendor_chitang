@@ -52,7 +52,7 @@ except:
     device = product
 
 if not depsonly:
-    print("Device %s not found. Attempting to retrieve device repository from LineageOS Github (http://github.com/LineageOS)." % device)
+    print("Device %s not found. Attempting to retrieve device repository from chitangUI Github (http://github.com/chitangUI)." % device)
 
 repositories = []
 
@@ -72,17 +72,19 @@ def add_auth(githubreq):
         githubreq.add_header("Authorization","Basic %s" % githubauth)
 
 if not depsonly:
-    githubreq = urllib.request.Request("https://raw.githubusercontent.com/LineageOS/mirror/master/default.xml")
+    // @TODO: upstream uses LineageOS/mirror
+    githubreq = urllib.request.Request("https://api.github.com/search/repositories?q=%s+user:chitangUI+in:name+fork:true" % device)
+    add_auth(githubreq)
     try:
-        result = ElementTree.fromstring(urllib.request.urlopen(githubreq).read().decode())
+        result = json.loads(urllib.request.urlopen(githubreq).read().decode())
     except urllib.error.URLError:
-        print("Failed to fetch data from GitHub")
+        print("Failed to search GitHub")
         sys.exit(1)
     except ValueError:
         print("Failed to parse return data from GitHub")
         sys.exit(1)
-    for res in result.findall('.//project'):
-        repositories.append(res.attrib['name'][10:])
+    for res in result.get('items', []):
+        repositories.append(res)
 
 local_manifests = r'.repo/local_manifests'
 if not os.path.exists(local_manifests): os.makedirs(local_manifests)
@@ -189,14 +191,14 @@ def add_to_manifest(repositories):
         repo_revision = repository['branch']
         print('Checking if %s is fetched from %s' % (repo_target, repo_name))
         if is_in_manifest(repo_target):
-            print('LineageOS/%s already fetched to %s' % (repo_name, repo_target))
+            print('%s already fetched to %s' % (repo_name, repo_target))
             continue
 
-        print('Adding dependency: LineageOS/%s -> %s' % (repo_name, repo_target))
+        print('Adding dependency: %s -> %s' % (repo_name, repo_target))
         project = ElementTree.Element("project", attrib = {
             "path": repo_target,
             "remote": "github",
-            "name": "LineageOS/%s" % repo_name,
+            "name": "%s" % repo_name,
             "revision": repo_revision })
         lm.append(project)
 
@@ -224,7 +226,14 @@ def fetch_dependencies(repo_path):
                 fetch_list.append(dependency)
                 syncable_repos.append(dependency['target_path'])
                 if 'branch' not in dependency:
-                    dependency['branch'] = get_default_or_fallback_revision(dependency['repository'])
+                    try:
+                        dependency['branch'] = get_default_or_fallback_revision('chitangUI/' + dependency['repository'])
+                        dependency['repository'] = 'chitangUI/' + dependency['repository']
+                        print("%s is resolved from chitangUI" % (dependency['repository']))
+                    except:
+                        dependency['branch'] = get_default_or_fallback_revision('LineageOS/' + dependency['repository'])
+                        dependency['repository'] = 'LineageOS/' + dependency['repository']
+                        print("%s is resolved from LineageOS" % (dependency['repository']))
             verify_repos.append(dependency['target_path'])
 
             if not os.path.isdir(dependency['target_path']):
@@ -252,17 +261,17 @@ def get_default_revision_no_minor():
     return get_default_revision().rsplit('.', 1)[0]
 
 def get_default_or_fallback_revision(repo_name):
-    default_revision = get_default_revision()
+    default_revision = "tehc"
     print("Default revision: %s" % default_revision)
     print("Checking branch info")
 
-    githubreq = urllib.request.Request("https://api.github.com/repos/LineageOS/" + repo_name + "/branches")
+    githubreq = urllib.request.Request("https://api.github.com/repos/" + repo_name + "/branches")
     add_auth(githubreq)
     result = json.loads(urllib.request.urlopen(githubreq).read().decode())
     if has_branch(result, default_revision):
         return default_revision
 
-    fallbacks = [ get_default_revision_no_minor() ]
+    fallbacks = [ get_default_revision(), get_default_revision_no_minor() ]
     if os.getenv('ROOMSERVICE_BRANCHES'):
         fallbacks += list(filter(bool, os.getenv('ROOMSERVICE_BRANCHES').split(' ')))
 
@@ -288,15 +297,16 @@ if depsonly:
     sys.exit()
 
 else:
-    for repo_name in repositories:
+    for repository in repositories:
+        repo_name = repository['name']
         if re.match(r"^android_device_[^_]*_" + device + "$", repo_name):
-            print("Found repository: %s" % repo_name)
+            print("Found repository: %s" % repository['name'])
             
             manufacturer = repo_name.replace("android_device_", "").replace("_" + device, "")
             repo_path = "device/%s/%s" % (manufacturer, device)
-            revision = get_default_or_fallback_revision(repo_name)
+            revision = get_default_or_fallback_revision('chitangUI/' + repo_name)
 
-            device_repository = {'repository':repo_name,'target_path':repo_path,'branch':revision}
+            device_repository = {'repository':'chitangUI/' + repo_name,'target_path':repo_path,'branch':revision}
             add_to_manifest([device_repository])
 
             print("Syncing repository to retrieve project.")
@@ -307,4 +317,4 @@ else:
             print("Done")
             sys.exit()
 
-print("Repository for %s not found in the LineageOS Github repository list. If this is in error, you may need to manually add it to your local_manifests/roomservice.xml." % device)
+print("Repository for %s not found in the chitangUI Github repository list. If this is in error, you may need to manually add it to your local_manifests/roomservice.xml." % device)

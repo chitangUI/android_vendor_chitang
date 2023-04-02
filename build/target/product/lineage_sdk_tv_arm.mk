@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-include vendor/lineage/build/target/product/lineage_generic_tv_target.mk
+include vendor/chitang/build/target/product/lineage_generic_tv_target.mk
 
 $(call inherit-product, device/google/atv/products/sdk_atv_armv7.mk)
 
@@ -24,7 +24,7 @@ PRODUCT_ENFORCE_ARTIFACT_PATH_REQUIREMENTS := relaxed
 
 # Overrides
 PRODUCT_NAME := lineage_sdk_tv_arm
-PRODUCT_MODEL := LineageOS Android TV SDK built for ARM
+PRODUCT_MODEL := Chi_Tang UI Android TV SDK built for ARM
 
 PRODUCT_SDK_ADDON_NAME := lineage
 PRODUCT_SDK_ADDON_SYS_IMG_SOURCE_PROP := $(LOCAL_PATH)/source.properties
