@@ -24,6 +24,7 @@ Additional LineageOS functions:
 
 Additional Chi_Tang UI functions:
 - ctco:            Commit and push
+- ctmg [repo]:     Auto merge from upstream
 EOF
 }
 
@@ -961,4 +962,46 @@ function ctco() {
     git add .
     git commit -S
     git push $(git remote) HEAD:tehc
+}
+
+function ctmg() {
+    if [[ ! -e ".git/config" ]]; then
+        printf "\033[0;31m* Not in a valid git repository\033[0m\n"
+        return
+    fi
+    printf "\033[0;32m| Chi_Tang UI Auto Upstream Merge\033[0m\n"
+
+    reponame=${1:-$(grep 'https://github.com/chitangUI' .git/config | sed -e 's/.*chitangUI\///mg')}
+    baserepo=chitangUI/$reponame
+    printf "\033[0;32m| Base repository: \033[0m%s\n" "$baserepo"
+
+    basebranch=tehc
+    if ! gh api -H "Accept: application/vnd.github+json" --silent "/repos/$baserepo/branches/$basebranch"; then
+        printf "\033[0;31m* Base branch %s not found\033[0m\n" $basebranch
+        return
+    fi
+    printf "\033[0;32m| Target branch: \033[0m%s\n" $basebranch
+
+    headowner=LineageOS
+    headbranch_name=lineage-20.0
+    if ! gh api -H "Accept: application/vnd.github+json" --silent "/repos/$headowner/$reponame/branches/$headbranch_name"; then
+        printf "\033[0;31m* HEAD branch %s not found\033[0m\n" $headbranch_name
+        headbranch_name=lineage-18.0
+    fi
+    if ! gh api -H "Accept: application/vnd.github+json" --silent "/repos/$headowner/$reponame/branches/$headbranch_name"; then
+        printf "\033[0;31m* fallback HEAD branch %s not found\033[0m\n" $headbranch_name
+        return
+    fi
+    headbranch=$headowner:$headbranch_name
+    printf "\033[0;32m| HEAD branch: \033[0m%s\n" $headbranch
+
+    body=$(printf "Merge %s into %s/%s\\nCreated by Chi_Tang UI Auto Upstream Merge Tool (\\\`ctmg\\\`)" "$headbranch" "$baserepo" $basebranch)
+
+    bash -c 'read -n1 -r -p "Press any key to continue..." _key'
+
+    printf "\033[0;32m* Creating MR\033[0m\n"
+    #createcmd=$(printf "gh pr --repo \"%s\" create --title \"Merge upstream\" --body \"%s\" --base %s --head %s" "$baserepo" "$body" $basebranch "$headbranch")
+    #printf "%s\n" "$createcmd"
+    #bash -c "$createcmd"
+    xdg-open "https://github.com/$baserepo/compare/$basebranch...$headbranch?expand=1&title=Merge%20upstream&body=$body"
 }
