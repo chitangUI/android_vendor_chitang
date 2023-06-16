@@ -24,7 +24,9 @@ Additional LineageOS functions:
 
 Additional Chi_Tang UI functions:
 - ctco:            Commit and push
-- ctmg [repo]:     Auto merge from upstream
+- ctmg [repo]:     Auto create MR to merge from upstream
+- ctus:            Unshallow the repo
+- ctpu:            Merge upstream locally
 EOF
 }
 
@@ -1004,4 +1006,13 @@ function ctmg() {
     #printf "%s\n" "$createcmd"
     #bash -c "$createcmd"
     xdg-open "https://github.com/$baserepo/compare/$basebranch...$headbranch?expand=1&title=Merge%20upstream&body=$body"
+}
+
+function ctus() {
+    git fetch --unshallow
+}
+
+function ctpu() {
+    reponame=${1:-$(grep 'https://github.com/chitangUI' .git/config | sed -e 's/.*chitangUI\///mg')}
+    git pull "git@github.com:LineageOS/$reponame.git ${2:-lineage-20.0}"
 }
