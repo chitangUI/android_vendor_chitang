@@ -1014,5 +1014,5 @@ function ctus() {
 
 function ctpu() {
     reponame=${1:-$(grep 'https://github.com/chitangUI' .git/config | sed -e 's/.*chitangUI\///mg')}
-    git pull "git@github.com:LineageOS/$reponame.git ${2:-lineage-20.0}"
+    git pull "git@github.com:LineageOS/$reponame.git" "${2:-lineage-20.0}"
 }
